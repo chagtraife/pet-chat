@@ -1,0 +1,36 @@
+{
+	"action": {
+		"default_icon": "images/icons/icon-48.png",
+		"default_popup": "popup.html",
+		"default_title": "My Pet – Virtual Pet Assistant for Browsing"
+	},
+	"background": {
+		"service_worker": "js/backgound.bundle.js"
+	},
+	"content_scripts": [
+		{
+			"matches": ["http://*/*", "https://*/*"],
+			"js": ["js/index.bundle.js"],
+			"css": ["style/content-style.css", "style/global-style.css"],
+			"all_frames": false,
+			"run_at": "document_idle"
+		}
+	],
+	"description": "Virtual Pet Assistant for Browsing",
+	"host_permissions": ["http://*/*", "https://*/*"],
+	"icons": {
+		"128": "images/icons/icon-128.png",
+		"48": "images/icons/icon-48.png"
+	},
+	"manifest_version": 3,
+	"name": "My Pet – Virtual Pet Assistant for Browsing",
+	"options_page": "popup.html",
+	"permissions": ["activeTab", "storage", "alarms"],
+	"version": "1.0.0",
+	"web_accessible_resources": [
+		{
+			"resources": ["assets/*", "images/*", "templates/*", "js/*.js.map", "style/*"],
+			"matches": ["http://*/*", "https://*/*"]
+		}
+	]
+}
