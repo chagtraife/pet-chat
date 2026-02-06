@@ -4,6 +4,7 @@ const menuItems = {
 	brightness: document.getElementById('brightness'),
 	translate: document.getElementById('translate'),
 	music: document.getElementById('music'),
+	changePet: document.getElementById('change-pet'),
 	properties: document.getElementById('properties'),
 };
 
@@ -108,6 +109,12 @@ menuItems.music?.addEventListener('click', () => {
 	console.log('Music clicked');
 	sendMessageToActiveTab('toggle-music');
 	setTimeout(() => window.close(), 300);
+});
+
+menuItems.changePet?.addEventListener('click', () => {
+	console.log('Change Pet clicked');
+	sendMessageToActiveTab('change-pet');
+	window.close();
 });
 
 menuItems.properties?.addEventListener('click', () => {

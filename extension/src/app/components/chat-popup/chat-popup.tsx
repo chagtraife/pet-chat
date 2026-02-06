@@ -192,7 +192,7 @@ function ChatPopup({ isVisible, onClose, petPosition }: ChatPopupProps) {
 					ref={inputRef}
 					type="text"
 					className="pet-chat-input"
-					placeholder="Say something... 🐾"
+					placeholder="Ask me something... 🐾"
 					value={input}
 					onChange={(e) => setInput(e.target.value)}
 					onKeyDown={handleKeyDown}

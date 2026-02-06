@@ -23,28 +23,51 @@ export class SimplePetRenderer {
 
 			console.log("🐱 SimplePetRenderer: Setting up pet image and click functionality");
 
-			// Set default pet image (dragon.png)
-			petImage.src = UtilsEngine.browser.runtime.getURL("/assets/dragon.png");
-			console.log("🐱 SimplePetRenderer: Pet image set to dragon.png");
+			// Load selected pet from chrome.storage.local with proper error handling
+			chrome.storage.local.get(['selected-pet'], (result) => {
+				let selectedPet = result['selected-pet'] || 'cat'; // Default fallback
+				
+				// Validate pet selection
+				if (!['cat', 'dog', 'bird', 'dragon'].includes(selectedPet)) {
+					selectedPet = 'cat';
+					// Save corrected default
+					chrome.storage.local.set({ 'selected-pet': selectedPet });
+					console.log('🐱 SimplePetRenderer: Invalid pet, corrected to:', selectedPet);
+				} else {
+					console.log('🐱 SimplePetRenderer: Loaded pet from chrome.storage:', selectedPet);
+				}
+				
+				const petImagePaths: { [key: string]: string } = {
+					'cat': '/assets/cat.png',
+					'dog': '/assets/dog.png',
+					'bird': '/assets/bird.png',
+					'dragon': '/assets/dragon.png'
+				};
 
-			// Set cursor to pointer to indicate clickable
-			petImage.style.cursor = "pointer";
+				// Set pet image based on selection with fallback
+				const petImagePath = petImagePaths[selectedPet] || petImagePaths['cat'];
+				petImage.src = UtilsEngine.browser.runtime.getURL(petImagePath);
+				console.log('🐱 SimplePetRenderer: Pet loaded:', selectedPet, '-> Image:', petImagePath);
 
-			// Add click handler to pet image
-			petImage.addEventListener("click", (event: MouseEvent) => {
-				console.log("🐱 SimplePetRenderer: Pet clicked!");
+				// Set cursor to pointer to indicate clickable
+				petImage.style.cursor = "pointer";
 
-				// Dispatch custom event for chat popup
-				const clickEvent = new CustomEvent("pet-clicked", {
-					detail: {
-						x: event.clientX,
-						y: event.clientY
-					}
+				// Add click handler to pet image
+				petImage.addEventListener("click", (event: MouseEvent) => {
+					console.log("🐱 SimplePetRenderer: Pet clicked!");
+
+					// Dispatch custom event for chat popup
+					const clickEvent = new CustomEvent("pet-clicked", {
+						detail: {
+							x: event.clientX,
+							y: event.clientY
+						}
+					});
+					window.dispatchEvent(clickEvent);
 				});
-				window.dispatchEvent(clickEvent);
-			});
 
-			console.log("🐱 SimplePetRenderer: Click handler setup complete");
+				console.log("🐱 SimplePetRenderer: Click handler setup complete");
+			}); // Close chrome.storage callback
 		};
 
 		setupPet();

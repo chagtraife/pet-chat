@@ -6,9 +6,12 @@
 	box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(0, 0, 0, 0.05);
 	display: flex;
 	flex-direction: column;
-	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+	font-family: "Roboto", ui-sans-serif, system-ui, -apple-system, "Segoe UI", "Ubuntu", "Cantarell", "Noto Sans", sans-serif;
+	font-weight: 400;
 	animation: slideIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 	overflow: hidden;
+	position: fixed; /* Changed to fixed for better control */
+	z-index: 999999999; /* Higher than menu */
 
 	@keyframes slideIn {
 		from {
@@ -29,13 +32,16 @@
 		align-items: center;
 		justify-content: space-between;
 		user-select: none;
+		flex-shrink: 0; /* Prevent header from shrinking */
+		position: relative;
+		z-index: 2; /* Ensure header stays on top */
 
 		.pet-chat-title {
 			display: flex;
 			align-items: center;
 			gap: 8px;
 			font-weight: 600;
-			font-size: 16px;
+			font-size: 17px;
 
 			.pet-emoji {
 				font-size: 20px;
@@ -95,12 +101,16 @@
 	.pet-chat-messages {
 		flex: 1;
 		overflow-y: auto;
+		overflow-x: hidden; /* Prevent horizontal scroll */
 		padding: 16px;
+		padding-bottom: 96px; /* Space for fixed input area */
 		background: #f8f9fa;
 		display: flex;
 		flex-direction: column;
 		gap: 12px;
-		min-height: 0;
+		min-height: 0; /* Important for flex scrolling */
+		height: calc(100% - 64px); /* Total height minus header */
+		position: relative;
 
 		&::-webkit-scrollbar {
 			width: 6px;
@@ -128,6 +138,8 @@
 			justify-content: center;
 			color: #6c757d;
 			gap: 8px;
+			min-height: 300px; /* Ensure minimum height for proper centering */
+			height: 100%; /* Take full container height */
 
 			.empty-emoji {
 				font-size: 48px;
@@ -136,7 +148,8 @@
 
 			p {
 				margin: 0;
-				font-size: 14px;
+				font-size: 15px;
+				font-weight: 500;
 			}
 		}
 
@@ -168,11 +181,12 @@
 
 			.message-bubble {
 				max-width: 70%;
-				padding: 10px 14px;
+				padding: 12px 16px;
 				border-radius: 16px;
 				word-wrap: break-word;
-				line-height: 1.4;
+				line-height: 1.5;
 				font-size: 14px;
+				font-weight: 400;
 			}
 
 			&.user .message-bubble {
@@ -236,14 +250,24 @@
 		display: flex;
 		gap: 8px;
 		align-items: center;
+		position: absolute; /* Fixed at bottom */
+		bottom: 0;
+		left: 0;
+		right: 0;
+		height: 80px; /* Fixed height */
+		box-sizing: border-box;
+		border-bottom-left-radius: 16px;
+		border-bottom-right-radius: 16px;
+		z-index: 10; /* Above messages */
 
 		.pet-chat-input {
 			flex: 1;
-			padding: 10px 14px;
+			padding: 12px 16px;
 			border: 2px solid #667eea;
 			border-radius: 20px;
 			font-size: 14px;
 			font-family: inherit;
+			font-weight: 400;
 			outline: none;
 			transition: all 0.2s;
 

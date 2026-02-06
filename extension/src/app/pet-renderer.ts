@@ -22,6 +22,9 @@ export const renderPet = async () => {
 	store.simplePetRenderer = new SimplePetRenderer();
 	store.spriteEngine = new SpriteEngine({});
 
+	// Make store globally accessible for pet switching
+	(window as any).spriteEngineStore = store;
+
 	console.log("🐱 renderPet: Simple pet initialization complete");
 	return elem;
 };

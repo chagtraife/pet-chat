@@ -67,6 +67,9 @@ function SpriteMenu() {
 				case "show-properties":
 					showPropertiesModal();
 					break;
+				case "change-pet":
+					showPetSelector();
+					break;
 				case "get-pet-state":
 					// Return current state to popup - read directly from localStorage to get fresh values
 			console.log("🐱 get-pet-state request received");
@@ -212,6 +215,272 @@ function SpriteMenu() {
 				style.remove();
 			}
 		}, 15000);
+	}
+
+	function showPetSelector(): void {
+		// Remove existing selector if any
+		const existingSelector = document.getElementById('pet-selector-modal');
+		if (existingSelector) {
+			existingSelector.remove();
+			return; // Toggle off if already shown
+		}
+
+		// Create backdrop
+		const backdrop = document.createElement('div');
+		backdrop.id = 'pet-selector-backdrop';
+		backdrop.style.cssText = `
+			position: fixed;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			background: rgba(0, 0, 0, 0.6);
+			z-index: 999998;
+			backdrop-filter: blur(8px);
+		`;
+
+		// Create pet selector modal
+		const selectorModal = document.createElement('div');
+		selectorModal.id = 'pet-selector-modal';
+		selectorModal.style.cssText = `
+			position: fixed;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+			background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+			color: white;
+			padding: 30px;
+			border-radius: 25px;
+			box-shadow: 0 25px 80px rgba(0, 0, 0, 0.4);
+			z-index: 999999;
+			width: 400px;
+			max-width: 90vw;
+			font-family: Arial, sans-serif;
+			animation: modalBounceIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+		`;
+
+		// Get current selected pet from chrome.storage
+		chrome.storage.local.get(['selected-pet'], (result) => {
+			const currentPet = result['selected-pet'] || 'cat';
+			console.log('🐾 Current pet from chrome.storage:', currentPet);
+
+			selectorModal.innerHTML = `
+				<style>
+					@keyframes modalBounceIn {
+						from { 
+							opacity: 0; 
+							transform: translate(-50%, -50%) scale(0.8); 
+						}
+						to { 
+							opacity: 1; 
+							transform: translate(-50%, -50%) scale(1); 
+						}
+					}
+					.pet-option {
+						background: rgba(255, 255, 255, 0.15);
+						border: 3px solid rgba(255, 255, 255, 0.3);
+						border-radius: 20px;
+						padding: 20px;
+						cursor: pointer;
+						transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+						text-align: center;
+						position: relative;
+						overflow: hidden;
+					}
+					.pet-option:hover {
+						background: rgba(255, 255, 255, 0.25);
+						border-color: rgba(255, 255, 255, 0.6);
+						transform: translateY(-5px) scale(1.02);
+						box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+					}
+					.pet-option.selected {
+						background: rgba(255, 255, 255, 0.3);
+						border-color: #ffd700;
+						box-shadow: 0 0 0 2px #ffd700, 0 10px 30px rgba(255, 215, 0, 0.3);
+					}
+					.pet-option::before {
+						content: '';
+						position: absolute;
+						top: -2px;
+						left: -2px;
+						right: -2px;
+						bottom: -2px;
+						background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+						border-radius: 22px;
+						opacity: 0;
+						transition: opacity 0.3s ease;
+					}
+					.pet-option:hover::before {
+						opacity: 1;
+					}
+					.pet-emoji {
+						font-size: 48px;
+						margin-bottom: 10px;
+						display: block;
+						filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+					}
+					.pet-name {
+						font-size: 18px;
+						font-weight: 600;
+						text-transform: uppercase;
+						letter-spacing: 1px;
+						text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+					}
+					.close-btn {
+						background: linear-gradient(45deg, #ff4757, #ff6b7a);
+						border: none;
+						color: white;
+						padding: 12px 30px;
+						border-radius: 25px;
+						cursor: pointer;
+						font-size: 16px;
+						font-weight: 600;
+						transition: all 0.3s ease;
+						width: 100%;
+						margin-top: 20px;
+					}
+					.close-btn:hover {
+						background: linear-gradient(45deg, #ff3742, #ff5722);
+						transform: translateY(-2px);
+						box-shadow: 0 8px 25px rgba(255, 71, 87, 0.4);
+					}
+				</style>
+				<div style="text-align: center; margin-bottom: 25px;">
+					<h2 style="margin: 0; font-size: 28px; font-weight: 700; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">🐾 Choose Your Pet</h2>
+				</div>
+				<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px;">
+					<div class="pet-option ${currentPet === 'cat' ? 'selected' : ''}" data-pet="cat">
+						<span class="pet-emoji">🐱</span>
+						<div class="pet-name">Cat</div>
+					</div>
+					<div class="pet-option ${currentPet === 'dog' ? 'selected' : ''}" data-pet="dog">
+						<span class="pet-emoji">🐕</span>
+						<div class="pet-name">Dog</div>
+					</div>
+					<div class="pet-option ${currentPet === 'bird' ? 'selected' : ''}" data-pet="bird">
+						<span class="pet-emoji">🐦</span>
+						<div class="pet-name">Bird</div>
+					</div>
+					<div class="pet-option ${currentPet === 'dragon' ? 'selected' : ''}" data-pet="dragon">
+						<span class="pet-emoji">🐲</span>
+						<div class="pet-name">Dragon</div>
+					</div>
+				</div>
+				<button id="close-pet-selector" class="close-btn">Close</button>
+			`;
+
+			document.body.appendChild(backdrop);
+			document.body.appendChild(selectorModal);
+
+			// Add pet selection event listeners
+			const petOptions = selectorModal.querySelectorAll('.pet-option');
+			petOptions.forEach(option => {
+				option.addEventListener('click', (e) => {
+					const selectedPet = (e.currentTarget as HTMLElement).getAttribute('data-pet');
+					if (selectedPet) {
+						// Remove selected class from all options
+						petOptions.forEach(opt => opt.classList.remove('selected'));
+						// Add selected class to clicked option
+						(e.currentTarget as HTMLElement).classList.add('selected');
+						
+						// Save to chrome.storage.local
+						chrome.storage.local.set({
+							'selected-pet': selectedPet
+						}, () => {
+							console.log("🐾 Pet selection saved to chrome.storage:", selectedPet);
+							
+							// Verify it was saved correctly
+							chrome.storage.local.get(['selected-pet'], (result) => {
+								console.log("🐾 Verified chrome.storage value:", result['selected-pet']);
+							});
+					
+					// Change pet image immediately using SimplePetRenderer
+							if ((window as any).spriteEngineStore?.simplePetRenderer) {
+								const petImagePaths: { [key: string]: string } = {
+									'cat': '/assets/cat.png',
+									'dog': '/assets/dog.png', 
+									'bird': '/assets/bird.png',
+									'dragon': '/assets/dragon.png'
+								};
+								(window as any).spriteEngineStore.simplePetRenderer.changePetImage(petImagePaths[selectedPet]);
+								console.log("🐾 Pet image changed to:", petImagePaths[selectedPet]);
+							}
+							
+							// Force a visual update by dispatching a custom event for other components
+							try {
+								const petChangeEvent = new CustomEvent('pet-changed', {
+									detail: { newPet: selectedPet }
+								});
+								window.dispatchEvent(petChangeEvent);
+								console.log("🐾 Pet change event dispatched for:", selectedPet);
+							} catch (error) {
+								console.log("🐾 Could not dispatch pet change event:", error);
+							}
+							
+							// Show notification
+							const petEmojis: { [key: string]: string } = {
+								'cat': '🐱',
+								'dog': '🐕',
+								'bird': '🐦',
+								'dragon': '🐲'
+							};
+							showFloatingEmoji(petEmojis[selectedPet] || '🐾');
+							
+							// Close modal after short delay
+							setTimeout(() => {
+								selectorModal.remove(); 
+								backdrop.remove();
+								
+								// Show success notification
+								setTimeout(() => {
+									const notif = document.createElement('div');
+									notif.style.cssText = `
+										position: fixed;
+										top: 20px;
+										right: 20px;
+										background: linear-gradient(45deg, #4CAF50, #45a049);
+										color: white;
+										padding: 15px 20px;
+										border-radius: 10px;
+										font-family: Arial, sans-serif;
+										font-weight: 600;
+										z-index: 999999;
+										animation: slideInRight 0.3s ease;
+										box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+									`;
+									notif.innerHTML = `
+										<style>
+											@keyframes slideInRight {
+												from { transform: translateX(100%); opacity: 0; }
+												to { transform: translateX(0); opacity: 1; }
+											}
+										</style>
+										${petEmojis[selectedPet]} Pet changed successfully!
+									`;
+									document.body.appendChild(notif);
+									
+									setTimeout(() => notif.remove(), 3000);
+								}, 500);
+							}, 800);
+						});
+					}
+				});
+			});
+			// Add close button listener
+			const closeBtn = selectorModal.querySelector('#close-pet-selector');
+			if (closeBtn) {
+				closeBtn.addEventListener('click', () => {
+					selectorModal.remove();
+					backdrop.remove();
+				});
+			}
+
+			// Close on backdrop click
+			backdrop.addEventListener('click', () => {
+				selectorModal.remove();
+				backdrop.remove();
+			});
+		}); // Close chrome.storage.local.get callback
 	}
 
 	function showBrightnessSlider(): void {
