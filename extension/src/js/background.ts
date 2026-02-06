@@ -2,6 +2,7 @@ import { SpriteEngine } from "./sprite-engine";
 import { store } from "./engines";
 import { UtilsEngine } from "./utils/utils";
 import { StorePublic } from "../app/app-context/store-context";
+import { CharacterAnimation } from "./player-engine";
 
 store.spriteEngine = new SpriteEngine({});
 
@@ -64,23 +65,19 @@ UtilsEngine.browser.runtime.onMessage.addListener(function (msg, sender, sendRes
 		});
 	}
 
-	// Handle pet action trigger from popup
-	if (msg.action == "triggerPetAction") {
-		const reaction = msg.reaction;
-		
-		// Trigger action based on reaction type
-		if (reaction === "eating") {
-			store.playerEngine.playAnimation("Eating", { loop: true });
-			// Reset animation after 2 seconds
+	// Handle like/dislike from chatbot
+	if (msg.action === "petResponse") {
+		const { type } = msg; // 'like' or 'dislike'
+		if (type === 'like') {
+			// Trigger happy animation
+			store.playerEngine.playAnimation(CharacterAnimation.Jump, { loop: false });
+		} else if (type === 'dislike') {
+			// Trigger sad animation
+			store.playerEngine.playAnimation(CharacterAnimation.Sleeping, { loop: true });
 			setTimeout(() => {
-				store.playerEngine.playAnimation("Idle");
+				store.playerEngine.playAnimation(CharacterAnimation.Idle, { loop: true });
 			}, 2000);
-		} else if (reaction === "jumping") {
-			store.playerEngine.playAnimation("Jump");
-		} else if (reaction === "playing") {
-			store.playerEngine.playAnimation("Walk");
 		}
-		
-		sendResponse({ success: true, reaction: reaction });
+		sendResponse({ success: true, type: type });
 	}
 });

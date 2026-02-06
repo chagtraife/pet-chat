@@ -6,6 +6,7 @@ import { WithOptional, WithRequired } from "./utils/utils";
 import { Point2d, RectType } from "./edge-detector";
 import { GSAPHelper } from "./utils/gsap-helper";
 import { StorePublic } from "../app/app-context/store-context";
+import { CustomAction } from "./sprite-engine";
 
 type ObjectAnimationEngineOptions = {
 	objectDom: Element;
@@ -24,10 +25,20 @@ export class ObjectAnimationEngine {
 	private init() {
 		gsap.registerPlugin(Draggable, MotionPathPlugin);
 
+		// Configure drag with proper click handling
 		Draggable.create(this.options.objectDom, {
 			type: "x,y",
-			dragClickables: false,
-			onDragEnd: this.dropToEdgeAfterDragEnds.bind(this), // On dragging the pet, drop vertically
+			dragClickables: false, // Don't prevent clicks on child elements
+			minimumMovement: 10,   // Only start drag after 10px movement
+			onDragStart: () => {
+				// Set dragging state using proper enum value
+				store.spriteEngine.customActionRunning = CustomAction.DRAGGING;
+			},
+			onDragEnd: () => {
+				// Reset dragging state after drag ends
+				store.spriteEngine.customActionRunning = undefined;
+				this.dropToEdgeAfterDragEnds.apply(this, arguments);
+			}
 		});
 	}
 

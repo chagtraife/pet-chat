@@ -7,3 +7,4 @@ export { WalkOnEdgeAction } from "./walk-on-edge-action";
 export { JumpToEdgeAction } from "./jump-to-edge-action";
 export { EatFoodAction } from "./eat-food-action";
 export { ScatterLettersAction } from "./scatter-letters-action";
+export { RandomMoveAction } from "./random-move-action";
