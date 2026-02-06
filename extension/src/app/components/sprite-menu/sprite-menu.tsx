@@ -703,6 +703,17 @@ function SpriteMenu() {
 		// Apply visibility with retry mechanism
 		applyPetVisibility(newVisibility);
 
+		// Dispatch event to notify chat popup about visibility change
+		try {
+			const petVisibilityEvent = new CustomEvent('pet-visibility-changed', {
+				detail: { isVisible: newVisibility }
+			});
+			window.dispatchEvent(petVisibilityEvent);
+			console.log("🐱 Pet visibility event dispatched:", newVisibility);
+		} catch (error) {
+			console.log("🐱 Could not dispatch pet visibility event:", error);
+		}
+
 		// Show notification
 		showFloatingEmoji(newVisibility ? '👁️' : '🫥');
 	}

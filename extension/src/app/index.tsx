@@ -92,6 +92,19 @@ function setupChatPopup() {
 		console.log("🐱 ChatPopup rendered with isVisible:", isChatVisible);
 	}
 
+	// Listen for pet visibility changes to auto-hide chat
+	console.log("🐱 Setting up pet-visibility-changed event listener");
+	window.addEventListener("pet-visibility-changed", ((event: CustomEvent) => {
+		console.log("🐱 Pet visibility changed event received!", event.detail);
+		
+		// If pet is hidden, hide the chat popup
+		if (!event.detail.isVisible && isChatVisible) {
+			console.log("🐱 Pet is hidden, closing chat popup");
+			isChatVisible = false;
+			updateChatPopup();
+		}
+	}) as EventListener);
+
 	// Listen for pet click event from SimplePetRenderer
 	console.log("🐱 Setting up pet-clicked event listener");
 	window.addEventListener("pet-clicked", ((event: CustomEvent) => {
@@ -99,6 +112,13 @@ function setupChatPopup() {
 
 		const petImage = document.getElementById("vp-pet-image");
 		if (petImage) {
+			// Check if pet is currently visible before allowing chat
+			const currentPetVisibility = localStorage.getItem('pet-visibility') !== 'hidden';
+			if (!currentPetVisibility) {
+				console.log("🐱 Pet is hidden, not opening chat");
+				return;
+			}
+
 			const rect = petImage.getBoundingClientRect();
 			console.log("🐱 Pet position:", rect);
 
