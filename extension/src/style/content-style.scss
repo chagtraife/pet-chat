@@ -2,26 +2,35 @@
 // @import "../app/components/pet-properties-modal/pet-properties-modal.scss";
 
 #vp-player-container {
-	width: 200px;
-	height: 140px;
 	position: fixed !important;
 	bottom: 20px !important;
 	right: 20px !important;
 	z-index: 999999999 !important;
 	pointer-events: auto !important;
-	
-	canvas {
-		display: block !important;
-		position: absolute !important;
-		bottom: 0 !important;
-		left: 0 !important;
-		pointer-events: auto !important;
+
+	#vp-pet-image-container {
+		cursor: grab !important;
+
+		&:active {
+			cursor: grabbing !important;
+		}
 	}
-	
-	&.vp-direction-right canvas {
+
+	#vp-pet-image {
+		animation: petIdle 3s ease-in-out infinite;
+		transition: filter 0.2s ease;
+		user-select: none;
+		-webkit-user-drag: none;
+
+		&:hover {
+			filter: brightness(1.1) drop-shadow(0 0 10px rgba(255, 215, 0, 0.5));
+		}
+	}
+
+	&.vp-direction-right #vp-pet-image {
 		transform: scaleX(-1);
 	}
-	
+
 	#vp-sprite-menu-container {
 		position: absolute !important;
 		bottom: 0 !important;
@@ -29,6 +38,22 @@
 		width: 100% !important;
 		height: 100% !important;
 		pointer-events: auto !important;
+	}
+}
+
+// Pet idle animation
+@keyframes petIdle {
+	0%, 100% {
+		transform: translateY(0) scale(1);
+	}
+	25% {
+		transform: translateY(-5px) scale(1.02);
+	}
+	50% {
+		transform: translateY(0) scale(1);
+	}
+	75% {
+		transform: translateY(-3px) scale(1.01);
 	}
 }
 

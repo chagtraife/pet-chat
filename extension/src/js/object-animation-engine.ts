@@ -34,10 +34,10 @@ export class ObjectAnimationEngine {
 				// Set dragging state using proper enum value
 				store.spriteEngine.customActionRunning = CustomAction.DRAGGING;
 			},
-			onDragEnd: () => {
+			onDragEnd: (event: any) => {
 				// Reset dragging state after drag ends
 				store.spriteEngine.customActionRunning = undefined;
-				this.dropToEdgeAfterDragEnds.apply(this, arguments);
+				this.dropToEdgeAfterDragEnds(event);
 			}
 		});
 	}

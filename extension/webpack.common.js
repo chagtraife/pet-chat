@@ -4,39 +4,28 @@ const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
 module.exports = {
 	entry: {
-		index: path.resolve("./src/app/index.tsx"),
-		popup: path.resolve("./popup.html"),
-		backgound: path.resolve("./src/js/background.ts"),
-		"content-style": path.resolve("./src/style/content-style.scss"),
+		index: path.resolve(__dirname, ".", "src", "app", "index.tsx"),
+		backgound: path.resolve(__dirname, ".", "src", "js", "background.ts"),
+		"content-style": path.resolve(__dirname, ".", "src", "style", "content-style.scss"),
 	},
 	output: {
+		path: path.join(__dirname, "dist"),
 		filename: "js/[name].bundle.js",
-		path: path.resolve(__dirname, "dist"),
-		pathinfo: false,
-		clean: true,
 	},
 	resolve: {
-		extensions: [".js", ".jsx", ".ts", ".tsx"],
+		extensions: [".ts", ".tsx", ".js", ".json"],
+		alias: {
+			"@app": path.resolve(__dirname, "src/app"),
+			"@js": path.resolve(__dirname, "src/js"),
+			"@style": path.resolve(__dirname, "src/style"),
+		},
 	},
 	module: {
 		rules: [
 			{
-				test: /\.jsx?$/,
-				exclude: /(node_modules|bower_components)/,
-				use: {
-					loader: "babel-loader",
-					options: {
-						presets: ["@babel/preset-env", "@babel/preset-react"],
-					},
-				},
-			},
-			{
 				test: /\.tsx?$/,
 				loader: "ts-loader",
 				exclude: /node_modules/,
-				options: {
-					transpileOnly: true,
-				},
 			},
 			{
 				test: /\.scss$/,
@@ -68,7 +57,12 @@ module.exports = {
 	},
 	plugins: [
 		new CopyPlugin({
-			patterns: [{ from: ".", to: ".", context: "public" }],
+			patterns: [
+				{ from: ".", to: ".", context: "public" },
+				{ from: "popup.html", to: "popup.html" },
+				{ from: "popup.js", to: "popup.js" },
+				{ from: "popup.css", to: "popup.css" },
+			],
 		}),
 		new MiniCssExtractPlugin({ filename: "style/[name].css" }),
 	],

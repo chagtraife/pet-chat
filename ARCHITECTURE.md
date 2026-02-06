@@ -44,20 +44,6 @@
 └─────────────────────────────────────────────────────────────────┘
           ↓
 ┌─────────────────────────────────────────────────────────────────┐
-│   🤖 POSE DETECTION (pet-chat/pose_detection) - Python/Docker  │
-├─────────────────────────────────────────────────────────────────┤
-│                                                                   │
-│  animal_pose.py                                                  │
-│  ├─> Nhập: ảnh/video động vật                                   │
-│  ├─> Xử lý bằng MMPose Model                                    │
-│  └─> Xuất: 17 keypoints (mắt, mũi, chân, đuôi, v.v.)          │
-│                                                                   │
-│  main.py                                                         │
-│  └─> Visualize skeleton của động vật                            │
-│                                                                   │
-└─────────────────────────────────────────────────────────────────┘
-          ↓
-┌─────────────────────────────────────────────────────────────────┐
 │        🔑 EXTERNAL SERVICES                                     │
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                   │
@@ -238,50 +224,6 @@ npm run build
 
 ---
 
-## 🔗 Kết Nối Pose Detection (Tương Lai)
-
-### Option 1: Thêm endpoint vào Backend
-```javascript
-// backend/index.js
-app.post("/detect-pose", async (req, res) => {
-  const { imageData } = req.body;
-  
-  // Gọi Python script qua child_process
-  const coordinates = await runPoseDetection(imageData);
-  
-  res.json({ coordinates });
-});
-```
-
-### Option 2: Microservice riêng (Flask)
-```python
-# pose_detection/app.py
-from flask import Flask, request
-from animal_pose import detect_animal_pose
-
-app = Flask(__name__)
-
-@app.route('/detect', methods=['POST'])
-def detect():
-    image_data = request.json['image']
-    coords = detect_animal_pose(image_data)
-    return {'coordinates': coords}
-
-if __name__ == '__main__':
-    app.run(port=5000)
-```
-
-### Extension gọi:
-```javascript
-// Sau khi có pose data:
-const poseRes = await fetch("http://localhost:5000/detect", {
-  method: "POST",
-  body: JSON.stringify({ image: imageData })
-});
-```
-
----
-
 ## 📋 Checklist Để Hệ Thống Hoạt động
 
 - [ ] **Backend chạy**
@@ -303,11 +245,6 @@ const poseRes = await fetch("http://localhost:5000/detect", {
   - Click icon pet extension
   - Chat trong popup
   - Pet hiển thị + animate trên trang
-
-- [ ] **Pose Detection (tương lai)**
-  - Setup Docker / Python environment
-  - Thêm endpoint `/detect-pose`
-  - Integrate với extension
 
 ---
 

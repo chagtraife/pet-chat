@@ -1,8 +1,9 @@
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { renderPet } from "./pet-renderer";
 import { StoreContex, StoreContextProvider, StorePublic } from "./app-context/store-context";
 import SpawnedSprites from "./components/spawned-sprites/spawned-sprites";
+import ChatPopup from "./components/chat-popup/chat-popup";
 import "./style/index.scss";
 import { UtilsEngine } from "../js/utils/utils";
 import SpriteMenu from "./components/sprite-menu/sprite-menu";
@@ -15,28 +16,9 @@ function ObjectSpritesApp() {
 		console.log("🐱 ObjectSpritesApp: useEffect triggered, calling renderPet");
 		renderPet().then(() => {
 			console.log("🐱 ObjectSpritesApp: renderPet completed");
-			
-			// Render SpriteMenu into the pet container after pet is ready
-			const menuContainer = document.getElementById("vp-sprite-menu-container");
-			if (menuContainer) {
-				console.log("🐱 ObjectSpritesApp: Found menu container, rendering SpriteMenu");
-				
-				// Add stylesheet to the menu container
-				const link = document.createElement("link");
-				link.rel = "stylesheet";
-				link.type = "text/css";
-				link.href = UtilsEngine.browser.runtime.getURL("/style/index.css");
-				menuContainer.appendChild(link);
-				
-				const menuRoot = createRoot(menuContainer);
-				menuRoot.render(
-					<StoreContextProvider>
-						<SpriteMenu />
-					</StoreContextProvider>
-				);
-			} else {
-				console.error("🐱 ObjectSpritesApp: Menu container not found");
-			}
+
+			// SpriteMenu functionality is now handled via messages from extension popup
+			// No need to render SpriteMenu component here
 		}).catch(error => {
 			console.error("🐱 ObjectSpritesApp: renderPet error:", error);
 		});
@@ -45,8 +27,97 @@ function ObjectSpritesApp() {
 	return (
 		<React.Fragment>
 			<SpawnedSprites />
+			<SpriteMenu />
 		</React.Fragment>
 	);
+}
+
+// Create ChatPopup container with isolated styles
+function setupChatPopup() {
+	console.log("🐱 Setting up chat popup with isolated styles");
+
+	// Create chat popup container with Shadow DOM for style isolation
+	const chatContainer = document.createElement("div");
+	chatContainer.id = "vp-chat-popup-container";
+	chatContainer.style.cssText = "position: fixed; z-index: 999999999; all: initial;";
+
+	// Use Shadow DOM to isolate styles
+	const chatShadow = chatContainer.attachShadow({ mode: "open" });
+
+	// Inject styles into shadow DOM only
+	const chatStyleLink = document.createElement("link");
+	chatStyleLink.rel = "stylesheet";
+	chatStyleLink.type = "text/css";
+	chatStyleLink.href = UtilsEngine.browser.runtime.getURL("/style/index.css");
+	chatShadow.appendChild(chatStyleLink);
+
+	// Create target for React
+	const chatTarget = document.createElement("div");
+	chatTarget.id = "chat-popup-target";
+	chatShadow.appendChild(chatTarget);
+
+	document.body.appendChild(chatContainer);
+	console.log("🐱 Chat container appended to body");
+
+	// Verify container is in DOM
+	const verifyContainer = document.getElementById("vp-chat-popup-container");
+	console.log("🐱 Chat container verification:", verifyContainer ? "Found" : "Not found");
+	if (verifyContainer) {
+		console.log("🐱 Container styles:", window.getComputedStyle(verifyContainer).cssText);
+	}
+
+	// Create root for chat popup in shadow DOM
+	const chatRoot = createRoot(chatTarget);
+	console.log("🐱 Chat root created");
+
+	// State for chat visibility and position
+	let isChatVisible = false;
+	let petPosition = { x: 0, y: 0 };
+
+	function updateChatPopup() {
+		console.log("🐱 updateChatPopup called, isChatVisible:", isChatVisible, "petPosition:", petPosition);
+		chatRoot.render(
+			<StoreContextProvider>
+				<ChatPopup
+					isVisible={isChatVisible}
+					onClose={() => {
+						console.log("🐱 Chat popup close button clicked");
+						isChatVisible = false;
+						updateChatPopup();
+					}}
+					petPosition={petPosition}
+				/>
+			</StoreContextProvider>
+		);
+		console.log("🐱 ChatPopup rendered with isVisible:", isChatVisible);
+	}
+
+	// Listen for pet click event from SimplePetRenderer
+	console.log("🐱 Setting up pet-clicked event listener");
+	window.addEventListener("pet-clicked", ((event: CustomEvent) => {
+		console.log("🐱 Pet clicked event received!", event.detail);
+
+		const petImage = document.getElementById("vp-pet-image");
+		if (petImage) {
+			const rect = petImage.getBoundingClientRect();
+			console.log("🐱 Pet position:", rect);
+
+			petPosition = {
+				x: rect.left + rect.width / 2,
+				y: rect.top
+			};
+
+			isChatVisible = !isChatVisible;
+			console.log("🐱 Toggling chat visibility to:", isChatVisible);
+
+			updateChatPopup();
+		} else {
+			console.error("🐱 Pet image not found!");
+		}
+	}) as EventListener);
+
+	// Initial render
+	updateChatPopup();
 }
 
 // Create container div
@@ -80,3 +151,6 @@ if (container) {
 		</StoreContextProvider>
 	);
 }
+
+// Setup chat popup outside Shadow DOM
+setupChatPopup();

@@ -1,10 +1,9 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<link rel="stylesheet" href="popup.css" />
-		<title>My Pet – Virtual Pet Assistant for Browsing</title>
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>My Pet – Virtual Pet Assistant</title>
 		<style>
 			* {
 				margin: 0;
@@ -13,238 +12,248 @@
 			}
 
 			body {
-				width: 450px;
-				max-width: 100%;
-				background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-				font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+				width: 320px;
+				min-height: 400px;
+				font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+				background: #f8f9fa;
+			}
+
+			.popup-container {
 				display: flex;
 				flex-direction: column;
-				height: 600px;
-				color: #333;
+				height: 100%;
 			}
 
 			.popup-header {
 				background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 				color: white;
-				padding: 16px;
+				padding: 20px;
 				display: flex;
 				align-items: center;
 				gap: 12px;
-				box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+				box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+			}
+
+			.pet-icon {
+				font-size: 32px;
+				animation: bounce 2s ease-in-out infinite;
+			}
+
+			@keyframes bounce {
+				0%, 100% { transform: translateY(0); }
+				50% { transform: translateY(-5px); }
 			}
 
 			.popup-header h1 {
-				font-size: 22px;
+				font-size: 20px;
 				font-weight: 600;
 				margin: 0;
+			}
+
+			.menu-list {
 				flex: 1;
-			}
-
-			.popup-header .pet-status {
-				display: flex;
-				gap: 8px;
-				font-size: 12px;
-			}
-
-			.popup-header .pet-status span {
-				background: rgba(255, 255, 255, 0.2);
-				padding: 4px 8px;
-				border-radius: 12px;
-				backdrop-filter: blur(10px);
-			}
-
-			#chat-container {
-				flex: 1;
+				padding: 8px;
 				overflow-y: auto;
-				padding: 16px;
-				background: white;
-				display: flex;
-				flex-direction: column;
-				gap: 12px;
 			}
 
-			.message {
-				display: flex;
-				gap: 8px;
-				animation: slideIn 0.3s ease;
-			}
-
-			.message.user {
-				justify-content: flex-end;
-			}
-
-			.message.pet {
-				justify-content: flex-start;
-			}
-
-			.message-bubble {
-				max-width: 70%;
-				padding: 12px 16px;
-				border-radius: 20px;
-				word-wrap: break-word;
-				line-height: 1.4;
-				font-size: 14px;
-			}
-
-			.message.user .message-bubble {
-				background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-				color: white;
-				border-bottom-right-radius: 4px;
-				box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
-			}
-
-			.message.pet .message-bubble {
-				background: #f0f4ff;
-				color: #333;
-				border-bottom-left-radius: 4px;
-				box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-				border: 2px solid #667eea;
-			}
-
-			.message-avatar {
-				font-size: 24px;
-				line-height: 1;
-			}
-
-			.pet-typing {
-				display: flex;
-				gap: 4px;
-				padding: 12px 16px;
-				background: #f0f4ff;
-				border-radius: 20px;
-				width: fit-content;
-			}
-
-			.pet-typing span {
-				width: 8px;
-				height: 8px;
-				background: #667eea;
-				border-radius: 50%;
-				animation: typing 1.4s infinite;
-			}
-
-			.pet-typing span:nth-child(2) {
-				animation-delay: 0.2s;
-			}
-
-			.pet-typing span:nth-child(3) {
-				animation-delay: 0.4s;
-			}
-
-			@keyframes typing {
-				0%, 60%, 100% {
-					opacity: 0.5;
-					transform: translateY(0);
-				}
-				30% {
-					opacity: 1;
-					transform: translateY(-10px);
-				}
-			}
-
-			@keyframes slideIn {
-				from {
-					opacity: 0;
-					transform: translateY(10px);
-				}
-				to {
-					opacity: 1;
-					transform: translateY(0);
-				}
-			}
-
-			.input-area {
-				padding: 16px;
-				background: white;
-				border-top: 1px solid #eee;
-				display: flex;
-				gap: 8px;
-				align-items: flex-end;
-			}
-
-			#input {
-				flex: 1;
-				padding: 12px 16px;
-				border: 2px solid #667eea;
-				border-radius: 24px;
-				font-size: 14px;
-				font-family: inherit;
-				outline: none;
-				transition: all 0.3s ease;
-			}
-
-			#input:focus {
-				border-color: #764ba2;
-				box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-			}
-
-			#input::placeholder {
-				color: #999;
-			}
-
-			.send-btn {
-				width: 44px;
-				height: 44px;
-				border: none;
-				background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-				color: white;
-				border-radius: 50%;
-				cursor: pointer;
-				font-size: 18px;
+			.menu-item {
 				display: flex;
 				align-items: center;
-				justify-content: center;
+				gap: 12px;
+				padding: 14px;
+				margin-bottom: 6px;
+				background: white;
+				border-radius: 12px;
+				cursor: pointer;
 				transition: all 0.2s ease;
-				box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+				border: 2px solid transparent;
+				box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+				position: relative;
 			}
 
-			.send-btn:hover {
-				transform: scale(1.05);
-				box-shadow: 0 4px 12px rgba(102, 126, 234, 0.5);
+			.menu-item:hover {
+				background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+				border-color: #667eea;
+				transform: translateX(4px);
+				box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
 			}
 
-			.send-btn:active {
-				transform: scale(0.95);
+			.menu-item:active {
+				transform: translateX(2px) scale(0.98);
 			}
 
-			/* Scrollbar styling */
-			#chat-container::-webkit-scrollbar {
+			.menu-icon {
+				font-size: 24px;
+				flex-shrink: 0;
+				width: 32px;
+				text-align: center;
+			}
+
+			.menu-content {
+				display: flex;
+				flex-direction: column;
+				gap: 2px;
+				flex: 1;
+			}
+
+			.menu-title {
+				font-size: 15px;
+				font-weight: 600;
+				color: #212529;
+				display: flex;
+				align-items: center;
+				gap: 8px;
+			}
+
+			.menu-description {
+				font-size: 12px;
+				color: #6c757d;
+			}
+
+			.status-badge {
+				display: inline-flex;
+				align-items: center;
+				gap: 4px;
+				padding: 2px 8px;
+				border-radius: 12px;
+				font-size: 10px;
+				font-weight: 600;
+				text-transform: uppercase;
+			}
+
+			.status-badge.on {
+				background: #d4edda;
+				color: #155724;
+			}
+
+			.status-badge.off {
+				background: #f8d7da;
+				color: #721c24;
+			}
+
+			.status-badge .dot {
+				width: 6px;
+				height: 6px;
+				border-radius: 50%;
+				animation: pulse 2s infinite;
+			}
+
+			.status-badge.on .dot {
+				background: #28a745;
+			}
+
+			.status-badge.off .dot {
+				background: #dc3545;
+			}
+
+			@keyframes pulse {
+				0%, 100% { opacity: 1; }
+				50% { opacity: 0.5; }
+			}
+
+			.popup-footer {
+				padding: 12px 20px;
+				background: white;
+				border-top: 1px solid #dee2e6;
+				text-align: center;
+			}
+
+			.footer-text {
+				font-size: 12px;
+				color: #6c757d;
+				font-weight: 500;
+			}
+
+			.menu-list::-webkit-scrollbar {
 				width: 6px;
 			}
 
-			#chat-container::-webkit-scrollbar-track {
-				background: #f1f1f1;
+			.menu-list::-webkit-scrollbar-track {
+				background: #f1f3f5;
 				border-radius: 10px;
 			}
 
-			#chat-container::-webkit-scrollbar-thumb {
+			.menu-list::-webkit-scrollbar-thumb {
 				background: #667eea;
 				border-radius: 10px;
 			}
 
-			#chat-container::-webkit-scrollbar-thumb:hover {
+			.menu-list::-webkit-scrollbar-thumb:hover {
 				background: #764ba2;
+			}
+
+			.loading {
+				opacity: 0.6;
+				pointer-events: none;
 			}
 		</style>
 	</head>
 
 	<body>
-		<div class="popup-header">
-			<div>
-				<h1>💬 Chat with Pet</h1>
+		<div class="popup-container">
+			<div class="popup-header">
+				<span class="pet-icon">🐾</span>
+				<h1>Pet Menu</h1>
 			</div>
-		</div>
 
-		<div id="chat-container"></div>
+			<div class="menu-list">
+				<div class="menu-item" id="toggle-visibility">
+					<span class="menu-icon">👁️</span>
+					<div class="menu-content">
+						<div class="menu-title">
+							<span>Toggle Pet</span>
+							<span class="status-badge on" id="pet-status">
+								<span class="dot"></span>
+								<span>ON</span>
+							</span>
+						</div>
+						<span class="menu-description">Show/hide pet on webpage</span>
+					</div>
+				</div>
 
-		<div class="input-area">
-			<input 
-				id="input" 
-				type="text" 
-				placeholder="Say something to your pet... 🐾"
-				autocomplete="off"
-			/>
-			<button class="send-btn" id="send-btn">📤</button>
+				<div class="menu-item" id="brightness">
+					<span class="menu-icon">💡</span>
+					<div class="menu-content">
+						<div class="menu-title">
+							<span>Brightness</span>
+							<span class="status-badge on" id="brightness-status">
+								<span>100%</span>
+							</span>
+						</div>
+						<span class="menu-description">Adjust page brightness</span>
+					</div>
+				</div>
+
+				<div class="menu-item" id="translate">
+					<span class="menu-icon">🌐</span>
+					<div class="menu-content">
+						<span class="menu-title">Translate</span>
+						<span class="menu-description">Translate current page</span>
+					</div>
+				</div>
+
+				<div class="menu-item" id="music">
+					<span class="menu-icon">🎵</span>
+					<div class="menu-content">
+						<div class="menu-title">
+							<span>Music</span>
+						</div>
+						<span class="menu-description">Play chill music</span>
+					</div>
+				</div>
+
+				<div class="menu-item" id="properties">
+					<span class="menu-icon">📋</span>
+					<div class="menu-content">
+						<span class="menu-title">Properties</span>
+						<span class="menu-description">View pet information</span>
+					</div>
+				</div>
+			</div>
+
+			<div class="popup-footer">
+				<span class="footer-text">💚 Pet Assistant v1.0</span>
+			</div>
 		</div>
 
 		<script type="text/javascript" src="popup.js"></script>
